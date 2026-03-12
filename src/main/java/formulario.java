@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
@@ -327,7 +328,26 @@ public class formulario extends javax.swing.JFrame {
 
                 try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(recurso.openStream()))) {
                     clip = AudioSystem.getClip();
-                    clip.open(audioInputStream);
+                    AudioFormat formato = audioInputStream.getFormat();
+                    boolean requiereConversion = formato.getSampleSizeInBits() > 16 || formato.getEncoding() != AudioFormat.Encoding.PCM_SIGNED;
+
+                    if (requiereConversion) {
+                        AudioFormat formatoCompatible = new AudioFormat(
+                                AudioFormat.Encoding.PCM_SIGNED,
+                                formato.getSampleRate(),
+                                16,
+                                formato.getChannels(),
+                                formato.getChannels() * 2,
+                                formato.getSampleRate(),
+                                false
+                        );
+
+                        try (AudioInputStream audioConvertido = AudioSystem.getAudioInputStream(formatoCompatible, audioInputStream)) {
+                            clip.open(audioConvertido);
+                        }
+                    } else {
+                        clip.open(audioInputStream);
+                    }
                     cacheSonidos.put(rutaAudio, clip);
                 }
             }
