@@ -3,9 +3,18 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -28,6 +37,10 @@ public class formulario extends javax.swing.JFrame {
 
     private static final int VALOR_CARTA_EVIL = -1;
 
+    private static final String AUDIO_EVIL = "/Audios/evil.wav";
+    private static final String AUDIO_PAREJA_CORRECTA = "/Audios/pareja-correcta.wav";
+    private static final String AUDIO_NIVEL_FINALIZADO = "/Audios/nivel-finalizado.wav";
+
     private final String[] rutasImagenesBase = {
         "/Imagenes/arcoiris.png",
         "/Imagenes/celebracion.png",
@@ -39,6 +52,7 @@ public class formulario extends javax.swing.JFrame {
     };
 
     private final String rutaCartaEvil = "/Imagenes/evil.png";
+    private final Map<String, Clip> cacheSonidos = new HashMap<>();
 
     public formulario() {
         initComponents();
@@ -246,6 +260,10 @@ public class formulario extends javax.swing.JFrame {
         }
 
         etiquetasCartas[indiceCarta].setBackground(Color.WHITE);
+
+        if (valoresCartas[indiceCarta] == VALOR_CARTA_EVIL) {
+            reproducirSonido(AUDIO_EVIL);
+        }
     }
 
     private void ocultar_carta(int indiceCarta) {
@@ -256,6 +274,7 @@ public class formulario extends javax.swing.JFrame {
 
     private void verificar_pareja() {
         if (valoresCartas[indicePrimeraCartaSeleccionada] == valoresCartas[indiceSegundaCartaSeleccionada]) {
+            reproducirSonido(AUDIO_PAREJA_CORRECTA);
             cartasEncontradas[indicePrimeraCartaSeleccionada] = true;
             cartasEncontradas[indiceSegundaCartaSeleccionada] = true;
             etiquetasCartas[indicePrimeraCartaSeleccionada].setBackground(Color.YELLOW);
@@ -265,6 +284,7 @@ public class formulario extends javax.swing.JFrame {
             indiceSegundaCartaSeleccionada = -1;
 
             if (todas_las_parejas_encontradas()) {
+                reproducirSonido(AUDIO_NIVEL_FINALIZADO);
                 JOptionPane.showMessageDialog(this, "¡Felicidades! Completaste el nivel " + nivelActual + "x" + nivelActual);
                 Integer siguienteNivel = mostrarDialogoSeleccionNivel();
                 if (siguienteNivel == null) {
@@ -294,6 +314,30 @@ public class formulario extends javax.swing.JFrame {
             }
         }
         return true;
+    }
+
+    private void reproducirSonido(String rutaAudio) {
+        try {
+            Clip clip = cacheSonidos.get(rutaAudio);
+            if (clip == null) {
+                java.net.URL recurso = getClass().getResource(rutaAudio);
+                if (recurso == null) {
+                    return;
+                }
+
+                try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(recurso.openStream()))) {
+                    clip = AudioSystem.getClip();
+                    clip.open(audioInputStream);
+                    cacheSonidos.put(rutaAudio, clip);
+                }
+            }
+
+            clip.stop();
+            clip.setFramePosition(0);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+            java.util.logging.Logger.getLogger(formulario.class.getName()).log(java.util.logging.Level.WARNING, "No se pudo reproducir el audio: " + rutaAudio, ex);
+        }
     }
 
     @SuppressWarnings("unchecked")
