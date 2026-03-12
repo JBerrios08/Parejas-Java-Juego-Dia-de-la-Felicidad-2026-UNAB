@@ -4,6 +4,9 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,47 +20,110 @@ public class formulario extends javax.swing.JFrame {
     private int indiceSegundaCartaSeleccionada = -1;
     private boolean bloqueoClicks = false;
 
-    // Cada valor de carta apunta a una de estas imágenes dentro de src/main/resources/Imagenes
-    // Asegúrate de que los archivos existan como f1.png, f2.png, etc.
-    private String[] rutasImagenesBase = {
-        "/Imagenes/sonrisa-clasica.png",
-        "/Imagenes/riendo-fuerte.png"
+    private int nivelActual = 1;
+    private int filasActuales;
+    private int columnasActuales;
+
+    private static final int VALOR_CARTA_EVIL = -1;
+
+    // Cartas regulares disponibles para formar parejas
+    private final String[] rutasImagenesBase = {
+        "/Imagenes/arcoiris.png",
+        "/Imagenes/celebracion.png",
+        "/Imagenes/corazon.png",
+        "/Imagenes/fiesta.png",
+        "/Imagenes/riendo-fuerte.png",
+        "/Imagenes/risa-grande.png",
+        "/Imagenes/sonrisa-clasica.png"
     };
+
+    private final String rutaCartaEvil = "/Imagenes/evil.png";
 
     public formulario() {
         initComponents();
-       // configurar_apariencia_juego();
-        inicializar_juego_parejas();
-    getContentPane().setLayout(new GridLayout(2, 2, 10, 10));
+        cargar_nivel(1);
     }
 
-    private void inicializar_juego_parejas() {
-        etiquetasCartas = new JLabel[]{label1, label2, label3, label4};
+    private void cargar_nivel(int nivel) {
+        nivelActual = nivel;
+        if (nivel == 1) {
+            inicializar_juego_parejas(2, 2);
+        } else {
+            inicializar_juego_parejas(4, 4);
+        }
+    }
 
-        ajustar_tamano_etiquetas();
+    private void inicializar_juego_parejas(int filas, int columnas) {
+        filasActuales = filas;
+        columnasActuales = columnas;
+        indicePrimeraCartaSeleccionada = -1;
+        indiceSegundaCartaSeleccionada = -1;
+        bloqueoClicks = false;
 
-        int numeroCartas = etiquetasCartas.length;
-        int numeroParejas = numeroCartas / 2;
-
+        int numeroCartas = filas * columnas;
+        etiquetasCartas = new JLabel[numeroCartas];
         valoresCartas = new int[numeroCartas];
         cartasEncontradas = new boolean[numeroCartas];
 
-        int indice = 0;
-        for (int valor = 1; valor <= numeroParejas; valor++) {
-            valoresCartas[indice++] = valor;
-            valoresCartas[indice++] = valor;
-        }
-        barajar_valores();
+        getContentPane().removeAll();
+        getContentPane().setLayout(new GridLayout(filas, columnas, 10, 10));
+
         for (int i = 0; i < numeroCartas; i++) {
+            JLabel etiqueta = new JLabel();
+            etiqueta.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
             final int indiceCarta = i;
-            configurar_carta_oculta(etiquetasCartas[i]);
-            
-            etiquetasCartas[i].addMouseListener(new MouseAdapter() {
+            etiqueta.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     manejar_clic_en_carta(indiceCarta);
                 }
             });
+            etiquetasCartas[i] = etiqueta;
+            getContentPane().add(etiqueta);
+        }
+
+        preparar_valores_del_nivel();
+
+        ajustar_tamano_etiquetas();
+        for (JLabel etiqueta : etiquetasCartas) {
+            configurar_carta_oculta(etiqueta);
+        }
+
+        revalidate();
+        repaint();
+    }
+
+    private void preparar_valores_del_nivel() {
+        List<Integer> valores = new ArrayList<>();
+
+        if (nivelActual == 1) {
+            // Nivel 1: 2 parejas aleatorias
+            List<Integer> imagenesDisponibles = new ArrayList<>();
+            for (int i = 0; i < rutasImagenesBase.length; i++) {
+                imagenesDisponibles.add(i);
+            }
+            Collections.shuffle(imagenesDisponibles);
+            for (int i = 0; i < 2; i++) {
+                int valor = imagenesDisponibles.get(i);
+                valores.add(valor);
+                valores.add(valor);
+            }
+        } else {
+            // Nivel 2: 7 parejas + 2 cartas evil
+            for (int i = 0; i < rutasImagenesBase.length; i++) {
+                valores.add(i);
+                valores.add(i);
+            }
+            valores.add(VALOR_CARTA_EVIL);
+            valores.add(VALOR_CARTA_EVIL);
+        }
+
+        Collections.shuffle(valores);
+        for (int i = 0; i < valores.size(); i++) {
+            valoresCartas[i] = valores.get(i);
+            if (valoresCartas[i] == VALOR_CARTA_EVIL) {
+                cartasEncontradas[i] = true;
+            }
         }
     }
 
@@ -71,26 +137,26 @@ public class formulario extends javax.swing.JFrame {
     }
 
     private ImageIcon escalar_imagen(java.net.URL recurso, int ancho, int alto) {
+        ImageIcon iconoOriginal = new ImageIcon(recurso);
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+        return new ImageIcon(imagenEscalada);
+    }
 
-    ImageIcon iconoOriginal = new ImageIcon(recurso);
-
-    Image imagenEscalada = iconoOriginal.getImage()
-            .getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
-
-    return new ImageIcon(imagenEscalada);
-}
-    
     // Hace que todas las etiquetas de cartas tengan el mismo tamaño visual
     public void ajustar_tamano_etiquetas() {
         if (etiquetasCartas == null) {
             return;
         }
-        java.awt.Dimension tamano = new java.awt.Dimension(200, 200);
+
+        int base = (nivelActual == 1) ? 180 : 120;
+        java.awt.Dimension tamano = new java.awt.Dimension(base, base);
+
         for (JLabel etiqueta : etiquetasCartas) {
             etiqueta.setPreferredSize(tamano);
             etiqueta.setMinimumSize(tamano);
             etiqueta.setMaximumSize(tamano);
         }
+
         pack();
         setLocationRelativeTo(null);
     }
@@ -98,68 +164,48 @@ public class formulario extends javax.swing.JFrame {
     // Configura colores y aspecto general del formulario para que se vea más profesional
     public void configurar_apariencia_juego() {
         getContentPane().setBackground(new Color(30, 30, 60)); // fondo oscuro elegante
-
-        
-    }
-
-    private void barajar_valores() {
-        java.util.Random aleatorio = new java.util.Random();
-        for (int i = valoresCartas.length - 1; i > 0; i--) {
-            int j = aleatorio.nextInt(i + 1);
-            int temp = valoresCartas[i];
-            valoresCartas[i] = valoresCartas[j];
-            valoresCartas[j] = temp;
-        }
     }
 
     private void manejar_clic_en_carta(int indiceCarta) {
-        if (bloqueoClicks) {
+        if (bloqueoClicks || cartasEncontradas[indiceCarta]) {
             return;
         }
-        if (cartasEncontradas[indiceCarta]) {
+
+        mostrar_carta(indiceCarta);
+
+        if (valoresCartas[indiceCarta] == VALOR_CARTA_EVIL) {
+            JOptionPane.showMessageDialog(this, "¡Susto! Has perdido");
+            cargar_nivel(nivelActual);
             return;
         }
 
         if (indicePrimeraCartaSeleccionada == -1) {
             indicePrimeraCartaSeleccionada = indiceCarta;
-            mostrar_carta(indiceCarta);
         } else if (indiceSegundaCartaSeleccionada == -1 && indiceCarta != indicePrimeraCartaSeleccionada) {
             indiceSegundaCartaSeleccionada = indiceCarta;
-            mostrar_carta(indiceCarta);
             verificar_pareja();
         }
     }
 
-private void mostrar_carta(int indiceCarta) {
+    private void mostrar_carta(int indiceCarta) {
+        String rutaImagen = (valoresCartas[indiceCarta] == VALOR_CARTA_EVIL)
+                ? rutaCartaEvil
+                : rutasImagenesBase[valoresCartas[indiceCarta]];
 
-    int indiceImagen = valoresCartas[indiceCarta] - 1;
-
-    if (indiceImagen >= 0 && indiceImagen < rutasImagenesBase.length) {
-
-        java.net.URL recurso = getClass().getResource(rutasImagenesBase[indiceImagen]);
-
+        java.net.URL recurso = getClass().getResource(rutaImagen);
         if (recurso != null) {
-
             int ancho = etiquetasCartas[indiceCarta].getWidth();
             int alto = etiquetasCartas[indiceCarta].getHeight();
-
             ImageIcon iconoEscalado = escalar_imagen(recurso, ancho, alto);
-
             etiquetasCartas[indiceCarta].setIcon(iconoEscalado);
             etiquetasCartas[indiceCarta].setText("");
-
         } else {
             etiquetasCartas[indiceCarta].setIcon(null);
-            etiquetasCartas[indiceCarta].setText(String.valueOf(valoresCartas[indiceCarta]));
+            etiquetasCartas[indiceCarta].setText("X");
         }
 
-    } else {
-        etiquetasCartas[indiceCarta].setIcon(null);
-        etiquetasCartas[indiceCarta].setText(String.valueOf(valoresCartas[indiceCarta]));
+        etiquetasCartas[indiceCarta].setBackground(Color.WHITE);
     }
-
-    etiquetasCartas[indiceCarta].setBackground(Color.WHITE);
-}
 
     private void ocultar_carta(int indiceCarta) {
         if (!cartasEncontradas[indiceCarta]) {
@@ -178,7 +224,12 @@ private void mostrar_carta(int indiceCarta) {
             indiceSegundaCartaSeleccionada = -1;
 
             if (todas_las_parejas_encontradas()) {
-                JOptionPane.showMessageDialog(this, "¡Has encontrado todas las parejas!");
+                if (nivelActual == 1) {
+                    JOptionPane.showMessageDialog(this, "¡Felicidades! Completaste el Nivel 1");
+                    cargar_nivel(2);
+                } else {
+                    JOptionPane.showMessageDialog(this, "¡Excelente! Completaste todos los niveles");
+                }
             }
         } else {
             bloqueoClicks = true;
@@ -195,8 +246,8 @@ private void mostrar_carta(int indiceCarta) {
     }
 
     private boolean todas_las_parejas_encontradas() {
-        for (boolean encontrada : cartasEncontradas) {
-            if (!encontrada) {
+        for (int i = 0; i < cartasEncontradas.length; i++) {
+            if (valoresCartas[i] != VALOR_CARTA_EVIL && !cartasEncontradas[i]) {
                 return false;
             }
         }
@@ -278,7 +329,7 @@ private void mostrar_carta(int indiceCarta) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
