@@ -1,4 +1,3 @@
-
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -9,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 public class formulario extends javax.swing.JFrame {
@@ -20,13 +22,12 @@ public class formulario extends javax.swing.JFrame {
     private int indiceSegundaCartaSeleccionada = -1;
     private boolean bloqueoClicks = false;
 
-    private int nivelActual = 1;
+    private int nivelActual = 2;
     private int filasActuales;
     private int columnasActuales;
 
     private static final int VALOR_CARTA_EVIL = -1;
 
-    // Cartas regulares disponibles para formar parejas
     private final String[] rutasImagenesBase = {
         "/Imagenes/arcoiris.png",
         "/Imagenes/celebracion.png",
@@ -41,16 +42,69 @@ public class formulario extends javax.swing.JFrame {
 
     public formulario() {
         initComponents();
-        cargar_nivel(1);
+        configurarMenu();
+        configurar_apariencia_juego();
+        seleccionarNivelInicial();
+    }
+
+    private void configurarMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuNiveles = new JMenu("Niveles");
+
+        for (int nivel = 2; nivel <= 7; nivel++) {
+            final int nivelSeleccionado = nivel;
+            JMenuItem itemNivel = new JMenuItem(nivel + "x" + nivel);
+            itemNivel.addActionListener(e -> cargar_nivel(nivelSeleccionado));
+            menuNiveles.add(itemNivel);
+        }
+
+        JMenu menuJuego = new JMenu("Juego");
+        JMenuItem itemSalir = new JMenuItem("Salir");
+        itemSalir.addActionListener(e -> salirDelJuego());
+        menuJuego.add(itemSalir);
+
+        menuBar.add(menuNiveles);
+        menuBar.add(menuJuego);
+        setJMenuBar(menuBar);
+    }
+
+    private void seleccionarNivelInicial() {
+        Integer nivel = mostrarDialogoSeleccionNivel();
+        if (nivel == null) {
+            salirDelJuego();
+            return;
+        }
+        cargar_nivel(nivel);
+    }
+
+    private Integer mostrarDialogoSeleccionNivel() {
+        String[] opciones = {"2x2", "3x3", "4x4", "5x5", "6x6", "7x7", "Salir"};
+        int respuesta = JOptionPane.showOptionDialog(
+                this,
+                "Elige un nivel para jugar:",
+                "Memorama - Día de la Felicidad",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        if (respuesta < 0 || respuesta == 6) {
+            return null;
+        }
+
+        return respuesta + 2;
+    }
+
+    private void salirDelJuego() {
+        dispose();
+        System.exit(0);
     }
 
     private void cargar_nivel(int nivel) {
         nivelActual = nivel;
-        if (nivel == 1) {
-            inicializar_juego_parejas(2, 2);
-        } else {
-            inicializar_juego_parejas(4, 4);
-        }
+        inicializar_juego_parejas(nivel, nivel);
     }
 
     private void inicializar_juego_parejas(int filas, int columnas) {
@@ -66,7 +120,7 @@ public class formulario extends javax.swing.JFrame {
         cartasEncontradas = new boolean[numeroCartas];
 
         getContentPane().removeAll();
-        getContentPane().setLayout(new GridLayout(filas, columnas, 10, 10));
+        getContentPane().setLayout(new GridLayout(filas, columnas, 8, 8));
 
         for (int i = 0; i < numeroCartas; i++) {
             JLabel etiqueta = new JLabel();
@@ -83,7 +137,6 @@ public class formulario extends javax.swing.JFrame {
         }
 
         preparar_valores_del_nivel();
-
         ajustar_tamano_etiquetas();
         for (JLabel etiqueta : etiquetasCartas) {
             configurar_carta_oculta(etiqueta);
@@ -95,35 +148,23 @@ public class formulario extends javax.swing.JFrame {
 
     private void preparar_valores_del_nivel() {
         List<Integer> valores = new ArrayList<>();
+        int numeroCartas = filasActuales * columnasActuales;
+        int parejasNecesarias = numeroCartas / 2;
 
-        if (nivelActual == 1) {
-            // Nivel 1: 2 parejas aleatorias
-            List<Integer> imagenesDisponibles = new ArrayList<>();
-            for (int i = 0; i < rutasImagenesBase.length; i++) {
-                imagenesDisponibles.add(i);
-            }
-            Collections.shuffle(imagenesDisponibles);
-            for (int i = 0; i < 2; i++) {
-                int valor = imagenesDisponibles.get(i);
-                valores.add(valor);
-                valores.add(valor);
-            }
-        } else {
-            // Nivel 2: 7 parejas + 2 cartas evil
-            for (int i = 0; i < rutasImagenesBase.length; i++) {
-                valores.add(i);
-                valores.add(i);
-            }
-            valores.add(VALOR_CARTA_EVIL);
+        for (int i = 0; i < parejasNecesarias; i++) {
+            int valorImagen = i % rutasImagenesBase.length;
+            valores.add(valorImagen);
+            valores.add(valorImagen);
+        }
+
+        if (numeroCartas % 2 != 0) {
             valores.add(VALOR_CARTA_EVIL);
         }
 
         Collections.shuffle(valores);
         for (int i = 0; i < valores.size(); i++) {
             valoresCartas[i] = valores.get(i);
-            if (valoresCartas[i] == VALOR_CARTA_EVIL) {
-                cartasEncontradas[i] = true;
-            }
+            cartasEncontradas[i] = false;
         }
     }
 
@@ -142,13 +183,13 @@ public class formulario extends javax.swing.JFrame {
         return new ImageIcon(imagenEscalada);
     }
 
-    // Hace que todas las etiquetas de cartas tengan el mismo tamaño visual
     public void ajustar_tamano_etiquetas() {
         if (etiquetasCartas == null) {
             return;
         }
 
-        int base = (nivelActual == 1) ? 180 : 120;
+        int mayorDimension = Math.max(filasActuales, columnasActuales);
+        int base = Math.max(70, 420 / mayorDimension);
         java.awt.Dimension tamano = new java.awt.Dimension(base, base);
 
         for (JLabel etiqueta : etiquetasCartas) {
@@ -161,9 +202,8 @@ public class formulario extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
-    // Configura colores y aspecto general del formulario para que se vea más profesional
     public void configurar_apariencia_juego() {
-        getContentPane().setBackground(new Color(30, 30, 60)); // fondo oscuro elegante
+        getContentPane().setBackground(new Color(30, 30, 60));
     }
 
     private void manejar_clic_en_carta(int indiceCarta) {
@@ -174,7 +214,8 @@ public class formulario extends javax.swing.JFrame {
         mostrar_carta(indiceCarta);
 
         if (valoresCartas[indiceCarta] == VALOR_CARTA_EVIL) {
-            JOptionPane.showMessageDialog(this, "¡Susto! Has perdido");
+            bloqueoClicks = true;
+            JOptionPane.showMessageDialog(this, "¡Encontraste la carta evil! Perdiste este intento.");
             cargar_nivel(nivelActual);
             return;
         }
@@ -194,8 +235,8 @@ public class formulario extends javax.swing.JFrame {
 
         java.net.URL recurso = getClass().getResource(rutaImagen);
         if (recurso != null) {
-            int ancho = etiquetasCartas[indiceCarta].getWidth();
-            int alto = etiquetasCartas[indiceCarta].getHeight();
+            int ancho = Math.max(50, etiquetasCartas[indiceCarta].getWidth());
+            int alto = Math.max(50, etiquetasCartas[indiceCarta].getHeight());
             ImageIcon iconoEscalado = escalar_imagen(recurso, ancho, alto);
             etiquetasCartas[indiceCarta].setIcon(iconoEscalado);
             etiquetasCartas[indiceCarta].setText("");
@@ -224,11 +265,12 @@ public class formulario extends javax.swing.JFrame {
             indiceSegundaCartaSeleccionada = -1;
 
             if (todas_las_parejas_encontradas()) {
-                if (nivelActual == 1) {
-                    JOptionPane.showMessageDialog(this, "¡Felicidades! Completaste el Nivel 1");
-                    cargar_nivel(2);
+                JOptionPane.showMessageDialog(this, "¡Felicidades! Completaste el nivel " + nivelActual + "x" + nivelActual);
+                Integer siguienteNivel = mostrarDialogoSeleccionNivel();
+                if (siguienteNivel == null) {
+                    salirDelJuego();
                 } else {
-                    JOptionPane.showMessageDialog(this, "¡Excelente! Completaste todos los niveles");
+                    cargar_nivel(siguienteNivel);
                 }
             }
         } else {
@@ -258,79 +300,23 @@ public class formulario extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        label1 = new javax.swing.JLabel();
-        label2 = new javax.swing.JLabel();
-        label3 = new javax.swing.JLabel();
-        label4 = new javax.swing.JLabel();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        label1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        label1.addAncestorListener(new javax.swing.event.AncestorListener() {
-            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
-                label1AncestorAdded(evt);
-            }
-            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
-            }
-            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
-            }
-        });
-
-        label3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                label3MouseClicked(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(label3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(label4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(478, 478, 478))
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(label3, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
-                    .addComponent(label4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(298, Short.MAX_VALUE))
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void label1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_label1AncestorAdded
-    }//GEN-LAST:event_label1AncestorAdded
-
-    private void label3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_label3MouseClicked
-    }//GEN-LAST:event_label3MouseClicked
-
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -338,29 +324,10 @@ public class formulario extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(formulario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(formulario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(formulario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(formulario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new formulario().setVisible(true);
-            }
-        });
+        java.awt.EventQueue.invokeLater(() -> new formulario().setVisible(true));
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel label1;
-    private javax.swing.JLabel label2;
-    private javax.swing.JLabel label3;
-    private javax.swing.JLabel label4;
-    // End of variables declaration//GEN-END:variables
 }
