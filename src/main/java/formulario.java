@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
@@ -95,8 +96,8 @@ public class formulario extends javax.swing.JFrame {
         String[] opciones = {"2x2", "3x3", "4x4", "5x5", "6x6", "7x7", "Salir"};
         int respuesta = JOptionPane.showOptionDialog(
                 this,
-                "Elige un nivel para jugar:",
-                "Memorama - Día de la Felicidad",
+                "Eligir un nivel para jugar:",
+                "Feliz día de la Felicidad",
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
@@ -198,6 +199,10 @@ public class formulario extends javax.swing.JFrame {
     }
 
     public void ajustar_tamano_etiquetas() {
+        if (etiquetasCartas == null) {
+            return;
+        }
+
         int mayorDimension = Math.max(filasActuales, columnasActuales);
         int base = Math.max(70, 420 / mayorDimension);
         java.awt.Dimension tamano = new java.awt.Dimension(base, base);
@@ -225,7 +230,7 @@ public class formulario extends javax.swing.JFrame {
 
         if (valoresCartas[indiceCarta] == VALOR_CARTA_EVIL) {
             bloqueoClicks = true;
-            JOptionPane.showMessageDialog(this, "¡Encontraste la carta evil! Perdiste este intento.");
+            JOptionPane.showMessageDialog(this, "Encontraste la carita mala, intenta otra vez!");
             cargar_nivel(nivelActual);
             return;
         }
@@ -244,11 +249,16 @@ public class formulario extends javax.swing.JFrame {
                 : rutasImagenesBase[valoresCartas[indiceCarta]];
 
         java.net.URL recurso = getClass().getResource(rutaImagen);
-        int ancho = Math.max(50, etiquetasCartas[indiceCarta].getWidth());
-        int alto = Math.max(50, etiquetasCartas[indiceCarta].getHeight());
-        ImageIcon iconoEscalado = escalar_imagen(recurso, ancho, alto);
-        etiquetasCartas[indiceCarta].setIcon(iconoEscalado);
-        etiquetasCartas[indiceCarta].setText("");
+        if (recurso != null) {
+            int ancho = Math.max(50, etiquetasCartas[indiceCarta].getWidth());
+            int alto = Math.max(50, etiquetasCartas[indiceCarta].getHeight());
+            ImageIcon iconoEscalado = escalar_imagen(recurso, ancho, alto);
+            etiquetasCartas[indiceCarta].setIcon(iconoEscalado);
+            etiquetasCartas[indiceCarta].setText("");
+        } else {
+            etiquetasCartas[indiceCarta].setIcon(null);
+            etiquetasCartas[indiceCarta].setText("X");
+        }
 
         etiquetasCartas[indiceCarta].setBackground(Color.WHITE);
 
@@ -276,7 +286,7 @@ public class formulario extends javax.swing.JFrame {
 
             if (todas_las_parejas_encontradas()) {
                 reproducirSonido(AUDIO_NIVEL_FINALIZADO);
-                JOptionPane.showMessageDialog(this, "¡Felicidades! Completaste el nivel " + nivelActual + "x" + nivelActual);
+                JOptionPane.showMessageDialog(this, "Felicidades! Completaste el nivel " + nivelActual + "x" + nivelActual);
                 Integer siguienteNivel = mostrarDialogoSeleccionNivel();
                 if (siguienteNivel == null) {
                     salirDelJuego();
@@ -312,9 +322,32 @@ public class formulario extends javax.swing.JFrame {
             Clip clip = cacheSonidos.get(rutaAudio);
             if (clip == null) {
                 java.net.URL recurso = getClass().getResource(rutaAudio);
+                if (recurso == null) {
+                    return;
+                }
+
                 try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(recurso.openStream()))) {
                     clip = AudioSystem.getClip();
-                    clip.open(audioInputStream);
+                    AudioFormat formato = audioInputStream.getFormat();
+                    boolean requiereConversion = formato.getSampleSizeInBits() > 16 || formato.getEncoding() != AudioFormat.Encoding.PCM_SIGNED;
+
+                    if (requiereConversion) {
+                        AudioFormat formatoCompatible = new AudioFormat(
+                                AudioFormat.Encoding.PCM_SIGNED,
+                                formato.getSampleRate(),
+                                16,
+                                formato.getChannels(),
+                                formato.getChannels() * 2,
+                                formato.getSampleRate(),
+                                false
+                        );
+
+                        try (AudioInputStream audioConvertido = AudioSystem.getAudioInputStream(formatoCompatible, audioInputStream)) {
+                            clip.open(audioConvertido);
+                        }
+                    } else {
+                        clip.open(audioInputStream);
+                    }
                     cacheSonidos.put(rutaAudio, clip);
                 }
             }
