@@ -19,12 +19,15 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 public class PanelJuego extends JPanel {
 
@@ -75,10 +78,16 @@ public class PanelJuego extends JPanel {
         tableroPanel.setOpaque(false);
         add(tableroPanel, BorderLayout.CENTER);
 
-        JButton volverBtn = new JButton("\u21A9 Volver al inicio");
+        JButton volverBtn = new JButton("Volver al inicio");
+        volverBtn.setIcon(crearIcono(FontAwesomeSolid.ARROW_LEFT));
         volverBtn.setFont(new Font("SansSerif", Font.BOLD, 15));
         volverBtn.addActionListener(e -> mainFrame.cambiarPantalla(MainFrame.PANTALLA_INICIO));
         add(volverBtn, BorderLayout.SOUTH);
+    }
+
+
+    private Icon crearIcono(FontAwesomeSolid icono) {
+        return FontIcon.of(icono, 15, new Color(58, 78, 116));
     }
 
     public void cargarNivel(int nivel) {
