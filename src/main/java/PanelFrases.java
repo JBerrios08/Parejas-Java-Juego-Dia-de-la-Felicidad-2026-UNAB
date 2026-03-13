@@ -27,7 +27,19 @@ public class PanelFrases extends JPanel {
         "Cada intento te acerca a tu mejor versión.",
         "Tus emociones importan, abrázalas con calma.",
         "Un día difícil no define toda tu historia.",
-        "Tu bienestar es prioridad, paso a paso."
+        "Tu bienestar es prioridad, paso a paso.",
+        "Incluso la noche más oscura termina con la salida del sol.",
+        "Tu historia aún tiene muchas páginas hermosas por escribir; no cierres el libro todavía.",
+        "El mundo es un lugar mejor porque tú estás en él.",
+        "Mañana es una nueva oportunidad para intentarlo, con más sabiduría y menos peso.",
+        "Sé amable contigo mismo; estás haciendo lo mejor que puedes con lo que tienes.",
+        "Descansar no es rendirse, es tomar aire para seguir volando como el Torogoz.",
+        "No tienes que ser perfecto para ser valioso.",
+        "Tu valor no depende de tus logros, sino de tu existencia misma.",
+        "Hablar de lo que sientes es el primer paso para que el peso deje de ser solo tuyo.",
+        "Pedir ayuda no es un signo de debilidad, sino de una valentía extraordinaria.",
+        "No tienes que caminar este sendero a solas; siempre hay una mano lista para sostenerte.",
+        "Tu voz importa, tus sentimientos son válidos y tu vida tiene un propósito."
     };
 
     private final JLabel fraseLabel;
@@ -40,7 +52,7 @@ public class PanelFrases extends JPanel {
         setBackground(new Color(240, 250, 247));
         setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40));
 
-        JLabel titulo = new JLabel("Espacio Zen", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("Espacio para ti", SwingConstants.CENTER);
         titulo.setFont(new Font("SansSerif", Font.BOLD, 38));
         titulo.setForeground(new Color(48, 103, 100));
         add(titulo, BorderLayout.NORTH);
