@@ -101,14 +101,14 @@ public class PanelFrases extends JPanel {
                 </ul>
                 <h3 style='color:#306764;'>Instituciones referentes</h3>
                 <ul>
-                  <li><b>🏫 UNAB - Sede San Miguel</b><br/>📍 Campus Central.<br/>
-                      📞 <a href='https://wa.me/50326658700'>2665-8700</a> &nbsp;|&nbsp; 🔗 <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
-                  <li><b>🏫 UNAB - Sede San Salvador</b><br/>📍 Atención académica y bienestar estudiantil.<br/>
-                      📞 <a href='https://wa.me/50326658701'>2665-8701</a> &nbsp;|&nbsp; 🔗 <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
-                  <li><b>🏫 UNAB - Sede Chalatenango</b><br/>📍 Atención a estudiantes en la zona norte.<br/>
-                      📞 <a href='https://wa.me/50326658702'>2665-8702</a> &nbsp;|&nbsp; 🔗 <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
-                  <li><b>🏫 UNAB - Sede Sonsonate</b><br/>📍 Atención académica y orientación estudiantil.<br/>
-                      📞 <a href='https://wa.me/50326658703'>2665-8703</a> &nbsp;|&nbsp; 🔗 <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
+                  <li><b>⚑ UNAB - Sede San Miguel</b><br/>◉ Campus Central.<br/>
+                      ☎ <a href='tel:+50326658700'>2665-8700</a> &nbsp;|&nbsp; ↪ <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
+                  <li><b>⚑ UNAB - Sede San Salvador</b><br/>◉ Atención académica y bienestar estudiantil.<br/>
+                      ☎ <a href='tel:+50326658701'>2665-8701</a> &nbsp;|&nbsp; ↪ <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
+                  <li><b>⚑ UNAB - Sede Chalatenango</b><br/>◉ Atención a estudiantes en la zona norte.<br/>
+                      ☎ <a href='tel:+50326658702'>2665-8702</a> &nbsp;|&nbsp; ↪ <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
+                  <li><b>⚑ UNAB - Sede Sonsonate</b><br/>◉ Atención académica y orientación estudiantil.<br/>
+                      ☎ <a href='tel:+50326658703'>2665-8703</a> &nbsp;|&nbsp; ↪ <a href='https://www.unab.edu.sv/'>Sitio web UNAB</a></li>
                 </ul>
                 <p><i>Si hay riesgo inmediato para tu vida o la de alguien más, llama al 911.</i></p>
                 </body>
