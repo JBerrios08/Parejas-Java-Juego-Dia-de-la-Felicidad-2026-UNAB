@@ -9,10 +9,13 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.swing.FontIcon;
 
 public class PanelInicio extends JPanel {
 
@@ -70,13 +73,13 @@ public class PanelInicio extends JPanel {
         JPanel panelBotones = new JPanel(new GridLayout(1, 3, 14, 14));
         panelBotones.setBackground(new Color(246, 244, 255));
 
-        JButton btnIniciar = crearBoton("Iniciar", "\u25B6");
+        JButton btnIniciar = crearBoton("Iniciar", FontAwesomeSolid.PLAY);
         btnIniciar.addActionListener(e -> solicitarNivelYJugar());
 
-        JButton btnFrases = crearBoton("Frases de Vida", "\u2764");
+        JButton btnFrases = crearBoton("Frases de Vida", FontAwesomeSolid.HEART);
         btnFrases.addActionListener(e -> mainFrame.cambiarPantalla(MainFrame.PANTALLA_FRASES));
 
-        JButton btnSalir = crearBoton("Salir", "\u2716");
+        JButton btnSalir = crearBoton("Salir", FontAwesomeSolid.TIMES);
         btnSalir.addActionListener(e -> System.exit(0));
 
         panelBotones.add(btnIniciar);
@@ -85,14 +88,20 @@ public class PanelInicio extends JPanel {
         return panelBotones;
     }
 
-    private JButton crearBoton(String texto, String iconoUnicode) {
-        JButton boton = new JButton(iconoUnicode + "  " + texto);
+    private JButton crearBoton(String texto, FontAwesomeSolid icono) {
+        JButton boton = new JButton(texto);
+        boton.setIcon(crearIcono(icono));
         boton.setFont(new Font("SansSerif", Font.BOLD, 16));
         boton.setFocusPainted(false);
         boton.setBackground(new Color(228, 232, 255));
         boton.setForeground(new Color(64, 72, 116));
         boton.setBorder(BorderFactory.createEmptyBorder(12, 16, 12, 16));
         return boton;
+    }
+
+
+    private Icon crearIcono(FontAwesomeSolid icono) {
+        return FontIcon.of(icono, 16, new Color(64, 72, 116));
     }
 
     private void solicitarNivelYJugar() {

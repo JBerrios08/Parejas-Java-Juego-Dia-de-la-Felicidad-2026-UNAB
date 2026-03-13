@@ -11,4 +11,17 @@
         <maven.compiler.target>23</maven.compiler.target>
         <exec.mainClass>Parejas321</exec.mainClass>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-swing</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+    </dependencies>
 </project>
