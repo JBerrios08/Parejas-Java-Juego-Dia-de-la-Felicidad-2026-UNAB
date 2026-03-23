@@ -70,7 +70,7 @@ public class PanelInicio extends JPanel {
     }
 
     private JPanel crearPanelBotones() {
-        JPanel panelBotones = new JPanel(new GridLayout(1, 3, 14, 14));
+        JPanel panelBotones = new JPanel(new GridLayout(2, 2, 14, 14));
         panelBotones.setBackground(new Color(246, 244, 255));
 
         JButton btnIniciar = crearBoton("Iniciar", FontAwesomeSolid.PLAY);
@@ -79,11 +79,15 @@ public class PanelInicio extends JPanel {
         JButton btnFrases = crearBoton("Frases de Vida", FontAwesomeSolid.HEART);
         btnFrases.addActionListener(e -> mainFrame.cambiarPantalla(MainFrame.PANTALLA_FRASES));
 
+        JButton btnAcerca = crearBoton("Acerca de", FontAwesomeSolid.USER);
+        btnAcerca.addActionListener(e -> mainFrame.cambiarPantalla(MainFrame.PANTALLA_ACERCA));
+
         JButton btnSalir = crearBoton("Salir", FontAwesomeSolid.TIMES);
         btnSalir.addActionListener(e -> System.exit(0));
 
         panelBotones.add(btnIniciar);
         panelBotones.add(btnFrases);
+        panelBotones.add(btnAcerca);
         panelBotones.add(btnSalir);
         return panelBotones;
     }
