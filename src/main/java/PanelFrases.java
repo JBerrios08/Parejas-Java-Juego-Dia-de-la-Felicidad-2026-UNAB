@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.JTextArea;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.swing.FontIcon;
 import javax.swing.event.HyperlinkEvent;
@@ -44,7 +45,7 @@ public class PanelFrases extends JPanel {
         "Tu voz importa, tus sentimientos son válidos y tu vida tiene un propósito."
     };
 
-    private final JLabel fraseLabel;
+    private final JTextArea fraseLabel;
     private final Random random;
     private int indiceFraseActual = -1;
 
@@ -59,11 +60,16 @@ public class PanelFrases extends JPanel {
         titulo.setForeground(new Color(48, 103, 100));
         add(titulo, BorderLayout.NORTH);
 
-        fraseLabel = new JLabel("", SwingConstants.CENTER);
+        fraseLabel = new JTextArea();
         fraseLabel.setFont(new Font("SansSerif", Font.PLAIN, 28));
         fraseLabel.setForeground(new Color(55, 82, 91));
-        fraseLabel.setVerticalAlignment(SwingConstants.CENTER);
-        fraseLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        fraseLabel.setEditable(false);
+        fraseLabel.setOpaque(false);
+        fraseLabel.setWrapStyleWord(true);
+        fraseLabel.setLineWrap(true);
+        fraseLabel.setFocusable(false);
+        fraseLabel.setHighlighter(null);
+        fraseLabel.setBorder(BorderFactory.createEmptyBorder());
 
         JPanel contenedorFrase = new JPanel(new GridBagLayout());
         contenedorFrase.setOpaque(false);
@@ -72,7 +78,7 @@ public class PanelFrases extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         contenedorFrase.add(fraseLabel, gbc);
 
         actualizarFrase();
@@ -123,7 +129,8 @@ public class PanelFrases extends JPanel {
         }
 
         indiceFraseActual = nuevoIndice;
-        fraseLabel.setText("<html><div style='text-align:center; width:900px;'>\u201C" + frases[nuevoIndice] + "\u201D</div></html>");
+        fraseLabel.setText("\u201C" + frases[nuevoIndice] + "\u201D");
+        fraseLabel.setCaretPosition(0);
     }
 
     private void mostrarContactosApoyo() {
