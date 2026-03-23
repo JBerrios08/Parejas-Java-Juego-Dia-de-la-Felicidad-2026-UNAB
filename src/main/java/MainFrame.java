@@ -10,11 +10,13 @@ public class MainFrame extends JFrame {
     public static final String PANTALLA_INICIO = "inicio";
     public static final String PANTALLA_JUEGO = "juego";
     public static final String PANTALLA_FRASES = "frases";
+    public static final String PANTALLA_ACERCA = "acerca";
 
     private final CardLayout cardLayout;
     private final PanelInicio panelInicio;
     private final PanelJuego panelJuego;
     private final PanelFrases panelFrases;
+    private final PanelAcerca panelAcerca;
 
     public MainFrame() {
         setTitle("Mente en Calma");
@@ -29,10 +31,12 @@ public class MainFrame extends JFrame {
         panelInicio = new PanelInicio(this);
         panelJuego = new PanelJuego(this);
         panelFrases = new PanelFrases(this);
+        panelAcerca = new PanelAcerca(this);
 
         add(panelInicio, PANTALLA_INICIO);
         add(panelJuego, PANTALLA_JUEGO);
         add(panelFrases, PANTALLA_FRASES);
+        add(panelAcerca, PANTALLA_ACERCA);
 
         configurarMenu();
         cambiarPantalla(PANTALLA_INICIO);
@@ -54,11 +58,14 @@ public class MainFrame extends JFrame {
         itemInicio.addActionListener(e -> cambiarPantalla(PANTALLA_INICIO));
         JMenuItem itemFrases = new JMenuItem("Frases de Vida");
         itemFrases.addActionListener(e -> cambiarPantalla(PANTALLA_FRASES));
+        JMenuItem itemAcerca = new JMenuItem("Acerca de");
+        itemAcerca.addActionListener(e -> cambiarPantalla(PANTALLA_ACERCA));
         JMenuItem itemSalir = new JMenuItem("Salir");
         itemSalir.addActionListener(e -> System.exit(0));
 
         menuNavegacion.add(itemInicio);
         menuNavegacion.add(itemFrases);
+        menuNavegacion.add(itemAcerca);
         menuNavegacion.add(itemSalir);
 
         menuBar.add(menuNiveles);
