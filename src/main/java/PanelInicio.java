@@ -99,7 +99,7 @@ public class PanelInicio extends JPanel {
         panelLogos.setOpaque(false);
 
         JLabel logoUnab = new JLabel();
-        Icon iconoUnab = cargarIconoEscalado("/Imagenes/logo-unab.png", 180, 70);
+        Icon iconoUnab = cargarIconoEscalado("/Imagenes/logo-unab.png", 120, 120);
         if (iconoUnab != null) {
             logoUnab.setIcon(iconoUnab);
         } else {
@@ -109,7 +109,7 @@ public class PanelInicio extends JPanel {
         }
 
         JLabel logoFacultad = new JLabel();
-        Icon iconoFacultad = cargarIconoEscalado("/Imagenes/logo-facultad.png", 180, 70);
+        Icon iconoFacultad = cargarIconoEscalado("/Imagenes/logo-facultad.png", 120, 120);
         if (iconoFacultad != null) {
             logoFacultad.setIcon(iconoFacultad);
         } else {

@@ -47,7 +47,7 @@ public class PanelAcerca extends JPanel {
         java.net.URL recursoFoto = getClass().getResource("/Imagenes/JaimeBerrios.jpg");
         if (recursoFoto != null) {
             ImageIcon foto = new ImageIcon(recursoFoto);
-            Image fotoEscalada = foto.getImage().getScaledInstance(260, 320, Image.SCALE_SMOOTH);
+            Image fotoEscalada = foto.getImage().getScaledInstance(280, 280, Image.SCALE_SMOOTH);
             fotoLabel.setIcon(new ImageIcon(fotoEscalada));
         } else {
             fotoLabel.setText("Foto no disponible");
