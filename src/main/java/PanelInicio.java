@@ -39,7 +39,7 @@ public class PanelInicio extends JPanel {
         java.net.URL recursoLogo = getClass().getResource("/Imagenes/logo.png");
         if (recursoLogo != null) {
             ImageIcon logo = new ImageIcon(recursoLogo);
-            Image logoEscalado = logo.getImage().getScaledInstance(220, 220, Image.SCALE_SMOOTH);
+            Image logoEscalado = logo.getImage().getScaledInstance(300, 110, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(logoEscalado));
         } else {
             logoLabel.setText("Mente en Calma");
@@ -108,7 +108,7 @@ public class PanelInicio extends JPanel {
         String[] opciones = {"2x2", "3x3", "4x4", "5x5", "6x6", "7x7"};
         String seleccion = (String) JOptionPane.showInputDialog(
                 this,
-                "Selecciona el nivel del memorama:",
+                "Selecciona el nivel :)",
                 "Niveles",
                 JOptionPane.QUESTION_MESSAGE,
                 null,

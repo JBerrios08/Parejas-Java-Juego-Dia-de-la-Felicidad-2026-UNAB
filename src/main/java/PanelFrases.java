@@ -52,7 +52,7 @@ public class PanelFrases extends JPanel {
         setBackground(new Color(240, 250, 247));
         setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40));
 
-        JLabel titulo = new JLabel("Espacio para ti", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("Espacio para ti, porque vales mil!!!", SwingConstants.CENTER);
         titulo.setFont(new Font("SansSerif", Font.BOLD, 38));
         titulo.setForeground(new Color(48, 103, 100));
         add(titulo, BorderLayout.NORTH);
