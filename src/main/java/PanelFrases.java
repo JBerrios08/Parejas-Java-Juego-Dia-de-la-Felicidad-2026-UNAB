@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -60,8 +62,21 @@ public class PanelFrases extends JPanel {
         fraseLabel = new JLabel("", SwingConstants.CENTER);
         fraseLabel.setFont(new Font("SansSerif", Font.PLAIN, 28));
         fraseLabel.setForeground(new Color(55, 82, 91));
+        fraseLabel.setVerticalAlignment(SwingConstants.CENTER);
+        fraseLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel contenedorFrase = new JPanel(new GridBagLayout());
+        contenedorFrase.setOpaque(false);
+        contenedorFrase.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        contenedorFrase.add(fraseLabel, gbc);
+
         actualizarFrase();
-        add(fraseLabel, BorderLayout.CENTER);
+        add(contenedorFrase, BorderLayout.CENTER);
 
         JPanel botones = new JPanel();
         botones.setBackground(new Color(240, 250, 247));
@@ -108,7 +123,7 @@ public class PanelFrases extends JPanel {
         }
 
         indiceFraseActual = nuevoIndice;
-        fraseLabel.setText("\u201C" + frases[nuevoIndice] + "\u201D");
+        fraseLabel.setText("<html><div style='text-align:center; width:900px;'>\u201C" + frases[nuevoIndice] + "\u201D</div></html>");
     }
 
     private void mostrarContactosApoyo() {
